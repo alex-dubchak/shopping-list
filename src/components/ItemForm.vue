@@ -1,10 +1,7 @@
 <template>
-  <div class="min-h-screen flex justify-center bg-gray-100">
-    <div class="flex flex-col gap-2 w-full max-w-xl p-4 bg-white rounded-2xl shadow">
-    <h2 class="text-xl font-semibold mb-4">Add New Item</h2>
-    <form @submit.prevent="handleSubmit" class="space-y-4">
-      <div>
-        <Combobox v-model="category" >
+  <form @submit.prevent="$emit('submit')" class="space-y-4">
+    <div>
+      <Combobox v-model="category" >
           <ComboboxLabel class="block font-medium">Category</ComboboxLabel>
           <div class="relative mt-1">
             <div
@@ -55,66 +52,40 @@
             </TransitionRoot>
           </div>
         </Combobox>
-
-      </div>
-      <div>
-        <label class="block font-medium">Item Name</label>
-        <input v-model="itemName" class="w-full border rounded p-2" required />
-      </div>
-      <div>
-        <label class="block font-medium">Note (optional)</label>
-        <textarea v-model="note" class="w-full border rounded p-2" rows="2" placeholder="Add any additional details"></textarea>
-      </div>
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Add</button>
-      <button type="button" @click="router.back()" class="bg-gray-300 text-black px-4 py-2 rounded">Cancel</button>
-    </form>
-   </div>
-  </div>
+    </div>
+    <div>
+      <label class="block font-medium">Item Name</label>
+      <input v-model="itemName" class="w-full border rounded p-2" required />
+    </div>
+    <div>
+      <label class="block font-medium">Note (optional)</label>
+      <textarea v-model="note" class="w-full border rounded p-2" rows="2" placeholder="Add any additional details"></textarea>
+    </div>
+    <slot name="buttons"></slot>
+  </form>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { useShoppingListStore } from '../store/shoppingListStore';
+import { ref, defineEmits, defineExpose } from 'vue';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid'
-import {
-  Combobox,
-  ComboboxInput,
-  ComboboxButton,
-  ComboboxOptions,
-  ComboboxOption,
-  TransitionRoot,
-  ComboboxLabel,
-} from '@headlessui/vue'
+import { Combobox, ComboboxInput, ComboboxButton, ComboboxOptions, ComboboxOption, TransitionRoot, ComboboxLabel } from '@headlessui/vue'
+import { useShoppingListStore } from '../store/shoppingListStore';
 
 const store = useShoppingListStore();
-const router = useRouter();
-
 const category = ref('');
 const itemName = ref('');
 const note = ref('');
 
-const handleSubmit = async () => {
-  const item = { 
-    name: itemName.value, 
-    bought: false,
-    note: note.value || null
-  };
-  console.log('Adding item:', item, 'to category:', category.value);
-  await store.addItem(category.value, item);
-  router.back();
-};
+defineEmits(['submit']);
 
-
-onMounted(async () => {
-  await store.fetchCategories();
-  store.categoryFilter = '';
+defineExpose({
+  category,
+  itemName,
+  note,
+  setValues(values) {
+    category.value = values.category ?? '';
+    itemName.value = values.name ?? '';
+    note.value = values.note ?? '';
+  }
 });
 </script>
-
-<style scoped>
-input {
-  outline: none;
-  border: 1px solid #ccc;
-}
-</style>
