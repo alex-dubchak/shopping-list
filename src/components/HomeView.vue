@@ -10,8 +10,10 @@
           :id="section.id"
           :title="section.name" 
           :items="section.items"
-          @toggle="store.toggleItem(section.category, $event)"
+          @toggle="store.toggleItem($event)"
           @edit="editItem" 
+          @add="addItem"
+          @uncheckAll="store.unsetCategory($event)"
         />
       </div>
 
@@ -37,8 +39,8 @@ onMounted(async () => {
   await store.fetchList();
 });
 
-function addItem() {
-  router.push('/add-item'); // Optional if you plan to make an AddItemView
+function addItem(categoryId) {
+  router.push(categoryId != null ? `/add-item/category/${categoryId}` : `/add-item`);
 }
 
 function editItem(item) {

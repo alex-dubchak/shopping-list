@@ -99,7 +99,7 @@ const handleSubmit = async () => {
     bought: bought.value,
     note: note.value || null
   };
-  await store.updateItem(category.value, item);
+  await store.updateItem(item, category.value);
   router.back();
 };
 

@@ -73,8 +73,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted,} from 'vue';
+import { useRouter , useRoute} from 'vue-router';
 import { useShoppingListStore } from '../store/shoppingListStore';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid'
 import {
@@ -89,6 +89,7 @@ import {
 
 const store = useShoppingListStore();
 const router = useRouter();
+const route = useRoute();
 
 const category = ref('');
 const itemName = ref('');
@@ -107,6 +108,9 @@ const handleSubmit = async () => {
 
 
 onMounted(async () => {
+  const categoryId = +route.params.id;
+  category.value = await store.getCategory(categoryId)
+  console.log('Selected category:', route.params.id, categoryId, category.value);
   await store.fetchCategories();
   store.categoryFilter = '';
 });

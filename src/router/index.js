@@ -6,6 +6,11 @@ const routes = [
   { path: '/', name: 'Home', component: HomeView },
   { path: '/add-item', name: 'AddItem', component: AddItemView },
   {
+      path: '/add-item/category/:id',
+      name: 'add-item-for-category',
+      component: () => import('../components/AddItemView.vue')
+    },
+  {
       path: '/edit-item/:id',
       name: 'edit-item',
       component: () => import('../components/EditItemView.vue')

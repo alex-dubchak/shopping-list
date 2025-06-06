@@ -26,8 +26,8 @@ export const useShoppingListStore = defineStore('shoppingList', {
           filtered = filtered.filter(i => i.name.toLowerCase().includes(state.search.toLowerCase()));
         }
         if (filtered.length > 0) result.push({
-         ...category,
-         items: filtered,
+          ...category,
+          items: filtered,
         });
       }
       return result;
@@ -41,7 +41,7 @@ export const useShoppingListStore = defineStore('shoppingList', {
     },
     queryCategory(state) {
       console.log('queryCategory', state.categoryFilter);
-      return (state.categoryFilter === '' || this.filteredCategories.length) ? null : {id: null, name: state.categoryFilter}
+      return (state.categoryFilter === '' || this.filteredCategories.length) ? null : { id: null, name: state.categoryFilter }
     }
   },
 
@@ -52,9 +52,15 @@ export const useShoppingListStore = defineStore('shoppingList', {
     async fetchCategories() {
       this.categories = await shoppingListService.fetchCategories();
     },
-    toggleItem(category, item) {
+    async toggleItem(item) {
+      console.log('toggleItem', item);
       item.bought = !item.bought;
-      shoppingListService.updateItem(category, item);
+      await shoppingListService.updateItem(item);
+    },
+    async unsetCategory(categoryId){
+      console.log('unsetCategory', categoryId);
+      await shoppingListService.updateItems({bought: false}, categoryId);
+      this.itemsByCategory = await shoppingListService.fetchList();
     },
     async addItem(category, item) {
       shoppingListService.addItem(category, item);
@@ -66,8 +72,8 @@ export const useShoppingListStore = defineStore('shoppingList', {
     async getCategory(id) {
       return await shoppingListService.getCategory(id);
     },
-    async updateItem(category, item) {
-      await shoppingListService.updateItem(category, item);
+    async updateItem(item, category) {
+      await shoppingListService.updateItem(item, category);
       this.itemsByCategory = await shoppingListService.fetchList();
     },
   }

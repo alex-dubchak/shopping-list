@@ -24,11 +24,6 @@ export default {
     }
     return list;
   },
-
-  async updateItem(category, item) {
-    // TODO: Update item in Google Sheets
-    console.log(`Updating item in category '${category}':`, item);
-  },
   async addCategory(category) {
     if (category.id == null) {
       this.categories.push(category);
@@ -47,15 +42,25 @@ export default {
     });
     localStorage.setItem('items', JSON.stringify(this.items));
   },
-  async updateItem(category, item) {
+  async updateItem(item, category) {
     const index = this.items.findIndex(i => i.id === item.id);
     if (index !== -1) {
       this.items[index] = { ...this.items[index], ...item };
-      await this.addCategory(category);
-      this.items[index].categoryId = category.id;
+      if (category) {
+        await this.addCategory(category);
+        this.items[index].categoryId = category.id;
+      }
       localStorage.setItem('items', JSON.stringify(this.items));
     }
   },
+  async updateItems(update, categoryId){
+    console.log('updateItems', update, categoryId);
+    this.items = this.items.map(item =>
+      item.categoryId === categoryId ? { ...item, ...update } : item
+    );
+    localStorage.setItem('items', JSON.stringify(this.items));
+  },
+
   async getItem(id) {
     const foundItem = this.items.find(i => i.id === id);
     return foundItem;
