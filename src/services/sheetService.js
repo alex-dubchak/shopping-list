@@ -4,7 +4,7 @@ let tokenClient
 let gapiInited = false
 let gisInited = false
 
-const API_KEY = 'AIzaSyDqSYjCB_t2LzKOWUCQ5VwrOg5cFxDGiKM';// import.meta.env.VITE_GOOGLE_API_KEY
+const API_KEY = '';// import.meta.env.VITE_GOOGLE_API_KEY
 const CLIENT_ID = '278326876217-dqmp2tub90c03k85nqhfa32lq8ag6380.apps.googleusercontent.com';//import.meta.env.VITE_GOOGLE_CLIENT_ID
 
 const SCOPES = 'https://www.googleapis.com/auth/spreadsheets'

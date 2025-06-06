@@ -1,14 +1,16 @@
 <template>
-  <div>
-    <h1 class="text-2xl font-bold p-4">My Shopping List</h1>
-    <FilterBar :filter="store.filter" @update:filter="store.filter = $event" />
-    <SearchBar @update:search="store.search = $event" />
+  <div class="min-h-screen flex justify-center bg-gray-100">
+    <div class="flex flex-col gap-2 w-full max-w-xl p-4 bg-white rounded-2xl shadow">
+      <h1 class="text-2xl font-bold p-4">My Shopping List</h1>
+      <FilterBar :filter="store.filter" @update:filter="store.filter = $event" />
+      <SearchBar @update:search="store.search = $event" />
 
-    <div v-for="(items, category) in store.filteredList" :key="category">
-      <ListSection :title="category" :items="items" @toggle="store.toggleItem(category, $event)" />
+      <div v-for="(items, category) in store.filteredList" :key="category">
+        <ListSection :title="category" :items="items" @toggle="store.toggleItem(category, $event)" />
+      </div>
+
+      <FloatingButton @click="addItem" />
     </div>
-
-    <FloatingButton @click="addItem" />
   </div>
 </template>
 
