@@ -5,8 +5,16 @@
       <FilterBar :filter="store.filter" @update:filter="store.filter = $event" />
       <SearchBar @update:search="store.search = $event" />
 
-      <div v-for="(items, category) in store.filteredList" :key="category">
-        <ListSection :title="category" :items="items" @toggle="store.toggleItem(category, $event)" />
+      <div v-for="section in store.filteredList" :key="section.id">
+        <ListSection 
+          :id="section.id"
+          :title="section.name" 
+          :items="section.items"
+          @toggle="store.toggleItem($event)"
+          @edit="editItem" 
+          @add="addItem"
+          @uncheckAll="store.unsetCategory($event)"
+        />
       </div>
 
       <FloatingButton @click="addItem" />
@@ -29,13 +37,14 @@ const router = useRouter();
 
 onMounted(async () => {
   await store.fetchList();
-  console.table(store.filteredList);
 });
 
-function addItem() {
-  // For now, show alert or navigate to an 'Add Item' route if needed
-  // alert('Add item modal goes here.');
-  router.push('/add-item'); // Optional if you plan to make an AddItemView
+function addItem(categoryId) {
+  router.push(categoryId != null ? `/add-item/category/${categoryId}` : `/add-item`);
+}
+
+function editItem(item) {
+  router.push(`/edit-item/${item.id}`);
 }
 </script>
 

@@ -3,15 +3,19 @@ import shoppingListService from '../services/shoppingListService';
 
 export const useShoppingListStore = defineStore('shoppingList', {
   state: () => ({
-    itemsByCategory: {},
-    filter: 'all',
-    search: ''
+    itemsByCategory: [],
+    categories: [],
+    filter: 'missing',
+    search: '',
+    categoryFilter: ''
   }),
 
   getters: {
     filteredList(state) {
-      const result = {};
-      for (const [category, items] of Object.entries(state.itemsByCategory)) {
+      const result = [];
+      var input = state.itemsByCategory;
+      for (const category of input) {
+        const { items } = category;
         let filtered = items;
         if (state.filter === 'missing') {
           filtered = items.filter(i => !i.bought);
@@ -21,9 +25,23 @@ export const useShoppingListStore = defineStore('shoppingList', {
         if (state.search) {
           filtered = filtered.filter(i => i.name.toLowerCase().includes(state.search.toLowerCase()));
         }
-        if (filtered.length > 0) result[category] = filtered;
+        if (filtered.length > 0) result.push({
+          ...category,
+          items: filtered,
+        });
       }
       return result;
+    },
+    filteredCategories(state) {
+      var input = state.categories.filter(c => {
+        return c.name.toLowerCase().includes(state.categoryFilter.toLowerCase());
+      });
+      console.log('filteredCategories', input);
+      return input;
+    },
+    queryCategory(state) {
+      console.log('queryCategory', state.categoryFilter);
+      return (state.categoryFilter === '' || this.filteredCategories.length) ? null : { id: null, name: state.categoryFilter }
     }
   },
 
@@ -31,16 +49,32 @@ export const useShoppingListStore = defineStore('shoppingList', {
     async fetchList() {
       this.itemsByCategory = await shoppingListService.fetchList();
     },
-    toggleItem(category, item) {
-      item.bought = !item.bought;
-      shoppingListService.updateItem(category, item);
+    async fetchCategories() {
+      this.categories = await shoppingListService.fetchCategories();
     },
-    addItem(category, item) {
-      if (!this.itemsByCategory[category]) {
-        this.itemsByCategory[category] = [];
-      }
-      this.itemsByCategory[category].push(item);
+    async toggleItem(item) {
+      console.log('toggleItem', item);
+      item.bought = !item.bought;
+      await shoppingListService.updateItem(item);
+    },
+    async unsetCategory(categoryId){
+      console.log('unsetCategory', categoryId);
+      await shoppingListService.updateItems({bought: false}, categoryId);
+      this.itemsByCategory = await shoppingListService.fetchList();
+    },
+    async addItem(category, item) {
       shoppingListService.addItem(category, item);
-    }
+      this.itemsByCategory = await shoppingListService.fetchList();
+    },
+    async getItem(id) {
+      return await shoppingListService.getItem(id);
+    },
+    async getCategory(id) {
+      return await shoppingListService.getCategory(id);
+    },
+    async updateItem(item, category) {
+      await shoppingListService.updateItem(item, category);
+      this.itemsByCategory = await shoppingListService.fetchList();
+    },
   }
 });
